@@ -17,6 +17,7 @@
     "express": "^4.17.3",
     "jose": "^4.6.0",
     "mongoose": "^6.2.4",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "webcrypto": "^0.1.1"
   }
 }
