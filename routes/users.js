@@ -8,8 +8,8 @@ const User = require('../models/User');
 
 router.get('/', async (req, res) => {
     try{
-	const users = await Post.find();
-	res.json(posts);
+	const users = await User.find();
+	res.json(users);
     } catch (err) {
 	res.json({ message: err });
     }
@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
 	password: body.password
     });
 
-    const salt = await bcrypt.salt(10);
+    const salt = await bcrypt.genSalt(10);
 
     user.password = await bcrypt.hash(user.password, salt)
 
@@ -51,17 +51,19 @@ router.post('/', async (req, res) => {
 router.post('/login', async (req, res) => {
     const body = req.body;
     try {
-	const user = User.findOne({ username: body.username });
-	const hash = helper.encrypt_pass(body.password);
+	const user = await User.findOne({ username: body.username });
 
-	if (hash != user.password) {
-	    res.status().json({ message: 'Incorrect email or password' });
-	} else {
-	    // create a jwt token and end it in the cookies
-	    const jwt = helpers.loginToken(user);
-	    console.log(jwt);
-	    res.send(200).json({ user: user.email, token: jwt});
-	}
+	await bcrypt.compare(body.password, user.password, async (err, result) => {
+	    if (err || !result) {
+		res.status(403).json({ message: 'Incorrect email or password' });
+	    } else {
+		// create a jwt token and end it in the cookies
+		const jwt = await helpers.loginToken(user);
+		// set the token in the cookies
+		res.cookie('token', jwt, { httpOnly: true });
+		res.status(200).json({ user: user.email });
+	    }
+	});
     } catch (err) {
 	res.status(400).send({ message: err });
     }
