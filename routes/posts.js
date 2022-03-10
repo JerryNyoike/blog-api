@@ -12,48 +12,54 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/specific', (req, res) => {
-    res.send('We are on a specific post');
-});
-
 router.post('/', async (req, res) => {
-    const post = new Post({
-	title: req.body.title,
-	description: req.body.description,
-    });
+    const body = req.body;
+    const token = req.cookies.token;
 
-    try {
-	const savedPosts = await post.save();
-	res.json(savedPosts);
-    } catch (err) {
-	res.json({ message: savedPosts });
+    const { loggedIn, u_id } = loggedIn(token);
+
+    if (loggedIn) {
+	const post = new Post({
+	    title: req.body.title,
+	    description: req.body.description,
+	    user_id: u_id
+	});
+
+	try {
+	    const savedPosts = await post.save();
+	    res.json({ message: 'Success' });
+	} catch (err) {
+	    res.json({ message: err });
+	}	
+    } else {
+	res.status(403).json({ message: 'Must be logged in' });
     }
 });
 
-router.post('/:postId', async (req, res) => {
+router.get('/:postId', async (req, res) => {
     try {
 	const post = await Post.findById(req.params.postId);
-	res.json(post);
+	res.json({ message: 'Success' });
     } catch (err) {
 	res.json({message: err});
-    }
+    }	
 });
 
 router.delete('/:postId', async (req, res) => {
-    try{
-	const removed = Post.remove({ _id: req.params.postId });
-	res.json();
-    } catch (err) {
-	res.json({message: err});
-    }
-});
+    const body = req.body;
+    const token = req.cookies.token;
 
-router.delete('/:postId', async (req, res) => {
-    try{
-	const removed = Post.remove({ _id: req.params.postId });
-	res.json(removed);
-    } catch (err) {
-	res.json({message: err});
+    const { loggedIn, u_id } = loggedIn(token);
+
+    if (loggedIn) {
+	try{
+	    const removed = Post.remove({ _id: req.params.postId });
+	    res.json();
+	} catch (err) {
+	    res.json({message: err});
+	}
+    } else {
+	res.status(403).json({ message: 'Must be logged in' });
     }
 });
 
