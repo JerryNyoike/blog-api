@@ -105,3 +105,6 @@ dist
 
 # environment vars
 .env
+
+# emacs files
+*~
