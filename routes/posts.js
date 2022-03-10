@@ -1,4 +1,5 @@
 const express = require('express');
+const helpers = require('./helpers');
 
 const router = express.Router();
 const Post = require('../models/Post');
@@ -15,8 +16,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     const body = req.body;
     const token = req.cookies.token;
-
-    const { loggedIn, u_id } = loggedIn(token);
+    const { loggedIn, u_id } = await helpers.loggedIn(token);
 
     if (loggedIn) {
 	const post = new Post({
@@ -49,7 +49,7 @@ router.delete('/:postId', async (req, res) => {
     const body = req.body;
     const token = req.cookies.token;
 
-    const { loggedIn, u_id } = loggedIn(token);
+    const { loggedIn, u_id } = helpers.loggedIn(token);
 
     if (loggedIn) {
 	try{
