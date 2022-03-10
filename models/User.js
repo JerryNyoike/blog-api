@@ -8,7 +8,11 @@ const UserSchema = new mongoose.Schema({
     email: {
 	type: String,
 	required: true
+    },
+    password: {
+	type: String,
+	required: true
     }
 });
 
-default.exports = mongoose.Model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema);
