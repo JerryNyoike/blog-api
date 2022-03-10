@@ -2,10 +2,13 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+
 require('dotenv').config();
 
 // Middleware
 app.use(bodyParser.json()); // use bodyparser to parse json body
+app.use(cookieParser); //parse cookies
 
 // Routing
 const postsRoute = require('./routes/posts');
