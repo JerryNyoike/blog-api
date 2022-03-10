@@ -8,7 +8,7 @@ require('dotenv').config();
 
 // Middleware
 app.use(bodyParser.json()); // use bodyparser to parse json body
-app.use(cookieParser); //parse cookies
+app.use(cookieParser()); //parse cookies
 
 // Routing
 const postsRoute = require('./routes/posts');
