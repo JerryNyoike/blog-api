@@ -1,7 +1,8 @@
-const crypto = require('crypto');
-const webcrypto = require('webcrypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const User = require('../models/User');
+
 require('dotenv').config();
 
 async function encrypt_pass(password) {
@@ -17,8 +18,11 @@ async function loginToken(user) {
 async function loggedIn(token) {
     try{
 	const data = jwt.verify(token, process.env.KEY);
+	const id = mongoose.Types.ObjectId(data.data);
 	
-	return { loggedIn: payload.data._id == user._id, u_id: payload.data._id };
+	const user = await User.findById(id, '_id email');
+
+	return { loggedIn: id.toString() == user._id.toString(), user: user };
     } catch (err) {
 	return { loggedIn: false, u_id: null };
     }
