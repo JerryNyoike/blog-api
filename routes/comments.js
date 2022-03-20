@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.get('/all/:post_id', async (req, res) => {
     try {
+	console.log('jwoeiureewrk');
 	const comments = await Comment.find({post_id: mongoose.Types.ObjectId(req.params.post_id)}, '_id user_id post_id content');
 
 	res.status(200).json(comments);
