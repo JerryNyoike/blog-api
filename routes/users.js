@@ -74,11 +74,11 @@ router.delete('/:u_id', async (req, res) => {
     // add check that user is logged in
     // token included in http-only cookies
     const token = req.get('Authorization').split(' ')[1].trim();
-    const data = helpers.loggedIn(token);
+    const data = await helpers.loggedIn(token);
     
     if (data.loggedIn) {
 	try{
-	    const removed = User.remove({ _id: data.u_id});
+	    const removed = await User.remove({ _id: data.user._id});
 	    res.status(200).json({ message: 'Success' });
 	} catch (err) {
 	    res.json({message: err});
