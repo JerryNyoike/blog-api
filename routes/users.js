@@ -5,15 +5,43 @@ const helpers = require('./helpers.js');
 const router = express.Router();
 const User = require('../models/User');
 
+/**
+* @openapi
+* /users:
+*       get:
+*          description: Fetch all users in the Database
+*          responses:
+*              200:
+*                description: Returns a list of users.
+*              500:
+*                description: Failure due to a server error.
+*/
 router.get('/', async (req, res) => {
     try{
 	const users = await User.find({}, '_id username email');
 	res.json(users);
     } catch (err) {
-	res.json({ message: err });
+	res.status(500).json({ message: err });
     }
 });
 
+/**
+* @openapi
+* /users/{user_id}:
+*       get:
+*          description: Fetch all users in the Database
+*          parameters:
+*              - in: path
+*                name: user_id
+*                type: string
+*                required: true
+*                description: Users id
+*          responses:
+*              200:
+*                description: Returns the specified user.
+*              500:
+*                description: Failure due to a server error.
+*/
 router.get('/:u_id', async (req, res) => {
     try{
 	const user = await User.findById(u_id, '_id username email');
@@ -23,11 +51,36 @@ router.get('/:u_id', async (req, res) => {
     }
 });
 
+/** @openapi
+* /users:
+*       post:
+*          description: Register a new user.
+*          requestBody:
+*              content:
+*                application/json:
+*                  schema:
+*                    username:
+*                      description: Users intended username.
+*                      required: true
+*                    email:
+*                      description: Users intended email.
+*                      required: true
+*                    password:
+*                      description: Users intended password.
+*                      required: true
+*          responses:
+*              200:
+*                description: New user is created in the system.
+*              400:
+*                description: The request body is malformed.
+*              500:
+*                description: Failure due to a server error.
+*/
 router.post('/', async (req, res) => {
     const body = req.body;
 
     if (!body.username || !body.email || !body.password)
-        res.status(400).json({ message: 'Invalid data' });
+        return res.status(400).json({ message: 'Invalid data' });
 
     const exists = await User.findOne({ username: body.username });
 
@@ -50,6 +103,28 @@ router.post('/', async (req, res) => {
     }
 });
 
+/** @openapi
+* /users:
+*       post:
+*          description: Login a registered user.
+*          requestBody:
+*              content:
+*                application/json:
+*                  schema:
+*                    email:
+*                      description: Users email.
+*                      required: true
+*                    password:
+*                      description: Users password.
+*                      required: true
+*          responses:
+*              200:
+*                description: User is created logged into the system.
+*              400:
+*                description: The request body is malformed.
+*              500:
+*                description: Failure due to a server error.
+*/
 router.post('/login', async (req, res) => {
     const body = req.body;
     try {
@@ -70,6 +145,25 @@ router.post('/login', async (req, res) => {
     }
 });
 
+
+/** @openapi
+* /users/login:
+*       post:
+*          description: Login a registered user.
+*          parameters:
+*              - in: header
+*                securityScemes:
+*                  BearerAuth:
+*                    type: http
+*                    scheme: bearer
+*          responses:
+*              200:
+*                description: User is created logged into the system.
+*              400:
+*                description: The request body is malformed.
+*              500:
+*                description: Failure due to a server error.
+*/
 router.delete('/:u_id', async (req, res) => {
     // add check that user is logged in
     // token included in http-only cookies

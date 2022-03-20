@@ -4,6 +4,19 @@ const helpers = require('./helpers');
 const router = express.Router();
 const Post = require('../models/Post');
 
+
+/** @openapi
+* /posts:
+*       get:
+*          description: Fetch all posts.
+*          responses:
+*              200:
+*                description: All posts are returned in JSON format.
+*              400:
+*                description: The request body is malformed.
+*              500:
+*                description: Failure due to a server error.
+*/
 router.get('/', async (req, res) => {
     try{
 	const posts = await Post.find();
@@ -13,6 +26,41 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+/** @openapi
+* /posts:
+*       post:
+*          description: Allows a user to create a post.
+*          parameters:
+*              - in: header
+*                securityScemes:
+*                  BearerAuth:
+*                    type: http
+*                    scheme: bearer
+*          requestBody:
+*              content:
+*                application/json:
+*                  schema:
+*                    title:
+*                      description: The title of the post the user wants to create.
+*                      type: string
+*                      required: true
+*                    description:
+*                      description: The short description of the user's post.
+*                      type: string
+*                      required: true
+*                    content:
+*                      description: The content of the user's post.
+*                      type: string
+*                      required: true
+*          responses:
+*              200:
+*                description: User's post is created.
+*              400:
+*                description: The request body is malformed.
+*              500:
+*                description: Failure due to a server error.
+*/
 router.post('/', async (req, res) => {
     const body = req.body;
     const token = req.get('Authorization').split(' ')[1].trim();
@@ -46,15 +94,58 @@ router.post('/', async (req, res) => {
     }
 });
 
+
+/** @openapi
+* /posts/{post_id}:
+*       post:
+*          description: Fetch a particular post.
+*          parameters:
+*              - in: path
+*                name: post_id
+*                schema:
+*                    type: string
+*                    required: true
+*          responses:
+*              200:
+*                description: The post is returned in JSON format.
+*              400:
+*                description: The request body is malformed.
+*              500:
+*                description: Failure due to a server error.
+*/
 router.get('/:postId', async (req, res) => {
     try {
 	const post = await Post.findById(req.params.postId);
 	res.json(post);
+
     } catch (err) {
 	res.json({message: err});
     }	
 });
 
+/** @openapi
+* /posts/{post_id}:
+*       delete:
+*          description: Delete a particular post.
+*          parameters:
+*              - in: path
+*                name: post_id
+*                schema:
+*                    type: string
+*                    required: true
+*              - in: header
+*                securityScemes:
+*                  BearerAuth:
+*                    type: http
+*                    scheme: bearer
+*          responses:
+*              200:
+*                description: The post is deleted successfully.
+*              400:
+*                description: The request body is malformed.
+*              500:
+*                description: Failure due to a server error.
+*/
 router.delete('/:postId', async (req, res) => {
     const token = req.get('Authorization').split(' ')[1].trim();
 
