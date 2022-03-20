@@ -1,6 +1,5 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const jwt = require('jose');
 const helpers = require('./helpers.js');
 
 const router = express.Router();
@@ -28,12 +27,14 @@ router.post('/', async (req, res) => {
     const body = req.body;
 
     if (!body.username || !body.email || !body.password)
-	res.status(400).json({ message: 'Invalid data' });
-    
+        res.status(400).json({ message: 'Invalid data' });
+
+    const exists = await User.findOne({ username: body.username });
+
     const user = new User({
-	username: body.username,
-	email: body.email,
-	password: body.password
+        username: body.username,
+        email: body.email,
+        password: body.password
     });
 
     const salt = await bcrypt.genSalt(10);
@@ -44,14 +45,15 @@ router.post('/', async (req, res) => {
 	const savedUser = await user.save();
 	res.status(200).json({ message: "Success" });
     } catch (err) {
-	res.status(400).json({ message: savedPosts });
+	const { _message:error } = err;
+	res.status(400).json({ message: error });
     }
 });
 
 router.post('/login', async (req, res) => {
     const body = req.body;
     try {
-	const user = await User.findOne({ username: body.username });
+	const user = await User.findOne({ email: body.email });
 
 	await bcrypt.compare(body.password, user.password, async (err, result) => {
 	    if (err || !result) {
@@ -60,8 +62,7 @@ router.post('/login', async (req, res) => {
 		// create a jwt token and end it in the cookies
 		const jwt = await helpers.loginToken(user);
 		// set the token in the cookies
-		res.cookie('token', jwt, { httpOnly: true });
-		res.status(200).json({ user: user.email });
+		res.status(200).json({ token: jwt });
 	    }
 	});
     } catch (err) {
@@ -72,12 +73,12 @@ router.post('/login', async (req, res) => {
 router.delete('/:u_id', async (req, res) => {
     // add check that user is logged in
     // token included in http-only cookies
-    const token = req.cookies.token;
-    const { loggedIn, u_id } = helpers.loggedIn(token);
-
-    if (loggedIn) {
+    const token = req.get('Authorization').split(' ')[1].trim();
+    const data = helpers.loggedIn(token);
+    
+    if (data.loggedIn) {
 	try{
-	    const removed = User.remove({ _id: u_id});
+	    const removed = User.remove({ _id: data.u_id});
 	    res.status(200).json({ message: 'Success' });
 	} catch (err) {
 	    res.json({message: err});
