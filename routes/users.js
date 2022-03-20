@@ -7,7 +7,7 @@ const User = require('../models/User');
 
 router.get('/', async (req, res) => {
     try{
-	const users = await User.find();
+	const users = await User.find('_id username email');
 	res.json(users);
     } catch (err) {
 	res.json({ message: err });
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:u_id', async (req, res) => {
     try{
-	const user = await User.findById(u_id);
+	const user = await User.findById(u_id, '_id username email');
 	res.status(200).json(user);
     } catch(err) {
 	res.json({ message: err });
