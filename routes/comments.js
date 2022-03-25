@@ -5,11 +5,10 @@ const helpers = require('./helpers');
 
 const router = express.Router();
 
-
 /** @openapi
 * /comments/all/{post_id}:
 *       post:
-*          description: Login a registered user.
+*          description: Get all comments on a particular post.
 *          parameters:
 *              - in: path
 *                name: post_id
@@ -37,7 +36,7 @@ router.get('/all/:post_id', async (req, res) => {
 /** @openapi
 * /comments/{comment_id}:
 *       post:
-*          description: Login a registered user.
+*          description: Get a comment by its ID.
 *          parameters:
 *              - in: header
 *                name: comment_id
@@ -66,7 +65,7 @@ router.get('/:comment_id', async (req, res) => {
 /** @openapi
 * /comments:
 *       post:
-*          description: Login a registered user.
+*          description: Create a comment on a post.
 *          parameters:
 *              - in: header
 *                securityScemes:
