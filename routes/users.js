@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
 * @openapi
 * /users/{user_id}:
 *       get:
-*          description: Fetch all users in the Database
+*          description: Fetch the user whose id matches the one provided.
 *          parameters:
 *              - in: path
 *                name: user_id
@@ -149,7 +149,7 @@ router.post('/login', async (req, res) => {
 /** @openapi
 * /users/login:
 *       post:
-*          description: Login a registered user.
+*          description: Delet the user record in the database.
 *          parameters:
 *              - in: header
 *                securityScemes:
